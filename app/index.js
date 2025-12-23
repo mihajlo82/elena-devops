@@ -20,14 +20,11 @@ app.get("/health", (req, res) => {
   res.status(200).send("OK");
 });
 
-// Graceful shutdown (important for DevOps)
-process.on("SIGTERM", () => {
-  console.log("SIGTERM received. Shutting down gracefully...");
-  process.exit(0);
-});
-
-app.listen(PORT, () => {
-  console.log(`${APP_NAME} running on port ${PORT} (${NODE_ENV})`);
-});
+// Start server ONLY if not running tests
+if (process.env.NODE_ENV !== "test") {
+  app.listen(PORT, () => {
+    console.log(`${APP_NAME} running on port ${PORT} (${NODE_ENV})`);
+  });
+}
 
 module.exports = app;
