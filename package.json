@@ -7,7 +7,7 @@
     "test": "tests"
   },
   "scripts": {
-    "test": "jest",
+    "test": "npx jest",
     "start": "node app/index.js",
     "dev": "NODE_ENV=dev node app/index.js"
   },
