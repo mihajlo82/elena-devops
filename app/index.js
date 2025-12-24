@@ -25,7 +25,7 @@ app.get("/dock", (req, res) => {
 
 app.get("/king", (req, res) => {
   res.json({
-    message: `King king station Aussie 22`,
+    message: `BURGER King king station Aussie 22`,
     environment: NODE_ENV
   });
 });
