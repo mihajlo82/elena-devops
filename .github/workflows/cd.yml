@@ -33,29 +33,50 @@ jobs:
     - name: Deploy to EC2
       uses: appleboy/ssh-action@v1
       with:
-       host: ${{ secrets.EC2_HOST }}
-       username: ubuntu
-       key: ${{ secrets.EC2_SSH_KEY }}
-       env:
-         BRANCH: ${{ github.ref_name }}
-      script: |
-        set -e
-        echo "Deploying branch: $BRANCH"
+        host: ${{ secrets.EC2_HOST }}
+        username: ubuntu
+        key: ${{ secrets.EC2_SSH_KEY }}
+        env:
+          BRANCH: ${{ github.ref_name }}   # <-- ensures branch is passed correctly
+        script: |
+          set -e
+          echo "Deploying branch: $BRANCH"
 
-        if [ "$BRANCH" = "dev" ]; then
-          APP_DIR="/var/www/nodeapp-dev"
-          PM2_NAME="nodeapp-dev"
-        else
-          APP_DIR="/var/www/nodeapp-prod"
-          PM2_NAME="nodeapp-prod"
-        fi
+          # Determine app directory and PM2 process
+          if [ "$BRANCH" = "dev" ]; then
+            APP_DIR="/var/www/nodeapp-dev"
+            PM2_NAME="nodeapp-dev"
+          else
+            APP_DIR="/var/www/nodeapp-prod"
+            PM2_NAME="nodeapp-prod"
+          fi
 
-        cd $APP_DIR
-        git fetch origin
-        git reset --hard origin/$BRANCH
-        git clean -fd
-        npm ci --omit=dev
-        pm2 restart $PM2_NAME || pm2 start app/index.js --name $PM2_NAME
-        pm2 save
-        pm2 flush
-        git log -1 --oneline
+          echo "App directory: $APP_DIR"
+          echo "PM2 process: $PM2_NAME"
+
+          # Navigate to app directory
+          cd $APP_DIR
+          pwd
+          ls -la
+
+          # Fetch latest code and clean folder
+          git fetch origin
+          git reset --hard origin/$BRANCH
+          git clean -fd
+
+          # Install production dependencies only
+          npm ci --omit=dev
+
+          # Restart PM2 process; start if not running
+          pm2 restart $PM2_NAME || pm2 start app/index.js --name $PM2_NAME
+
+          # Save PM2 process list for auto-start on reboot
+          pm2 save
+          pm2 flush
+
+          # Show last deployed commit
+          echo "Deployed commit:"
+          git log -1 --oneline
+
+          # Optional: show PM2 status
+          pm2 status $PM2_NAME
