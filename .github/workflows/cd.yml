@@ -67,7 +67,7 @@ jobs:
           npm ci --omit=dev
 
           # Restart PM2 process; start if not running
-          pm2 restart $PM2_NAME || pm2 start app.js --name $PM2_NAME
+          pm2 restart $PM2_NAME || pm2 start app/index.js --name $PM2_NAME
 
           # Save PM2 process list for auto-start on reboot
           pm2 save
