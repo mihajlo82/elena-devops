@@ -30,9 +30,9 @@ AWS EC2 Instance
 
 ***Branch & Environment Strategy***
 
-Git Branch    	Environment  	  Domain    	 Port   	    PM2 Process
--dev          Development    dev.abcde.com       3001           nodeapp-dev        
--main          Production      abcde.com         3000           nodeapp-prod
+Git Branch    	Environment  	   Domain    	            Port   	       PM2 Process
+-dev          Development      dev.ec2-public-url.com       3001           nodeapp-dev        
+-main          Production       ec2-public-url.com          3000           nodeapp-prod
 
 Each branch is automatically deployed to its corresponding environment.
 
