@@ -36,9 +36,9 @@ jobs:
       with:
         host: ${{ secrets.EC2_HOST }}
         username: ubuntu
+        key: ${{ secrets.EC2_SSH_KEY }}
         env:
           BRANCH: ${{ github.ref_name }}
-        key: ${{ secrets.EC2_SSH_KEY }}
         script: |
           echo "Deploying branch: $BRANCH"
 
