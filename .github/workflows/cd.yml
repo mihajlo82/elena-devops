@@ -1,5 +1,6 @@
 name: CI/CD Deploy
 
+# Trigger on pushes to dev or main
 on:
   push:
     branches:
@@ -11,32 +12,39 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    # Step 1: Checkout code
     - name: Checkout code
       uses: actions/checkout@v3
 
+    # Step 2: Setup Node.js
     - name: Setup Node.js
       uses: actions/setup-node@v3
       with:
         node-version: 18
 
-    - name: Install dependencies for testing
+    # Step 3: Install dependencies for testing (includes dev dependencies)
+    - name: Install dependencies
       run: npm ci
 
+    # Step 4: Run tests
     - name: Run tests
       run: npm test
 
+    # Step 5: Deploy to EC2 via SSH
     - name: Deploy to EC2
       uses: appleboy/ssh-action@v1
-      env:
-        BRANCH: ${{ github.ref_name }}
       with:
         host: ${{ secrets.EC2_HOST }}
         username: ubuntu
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
           set -e
+
+          # Determine branch name reliably
+          BRANCH="${GITHUB_REF#refs/heads/}"
           echo "Deploying branch: $BRANCH"
 
+          # Set app directory and PM2 process
           if [ "$BRANCH" = "dev" ]; then
             APP_DIR="/var/www/nodeapp-dev"
             PM2_NAME="nodeapp-dev"
@@ -48,19 +56,26 @@ jobs:
           echo "App directory: $APP_DIR"
           echo "PM2 process: $PM2_NAME"
 
+          # Navigate to app directory
           cd $APP_DIR
           pwd
           ls -la
 
+          # Update code from GitHub
           git fetch origin
           git reset --hard origin/$BRANCH
           git clean -fd
 
+          # Install production dependencies only
           npm ci --omit=dev
 
+          # Restart PM2 process; start if not running
           pm2 restart $PM2_NAME || pm2 start app/index.js --name $PM2_NAME
+
+          # Save PM2 process list for auto-start on reboot
           pm2 save
           pm2 flush
 
+          # Optional: log latest commit deployed
           echo "Deployed commit:"
           git log -1 --oneline
