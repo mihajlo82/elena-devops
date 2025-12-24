@@ -18,7 +18,7 @@ app.get("/", (req, res) => {
 
 app.get("/dock", (req, res) => {
   res.json({
-    message: `Dock station Aussie`,
+    message: `Dock station Aussie 22`,
     environment: NODE_ENV
   });
 });
