@@ -16,6 +16,13 @@ app.get("/", (req, res) => {
   });
 });
 
+app.get("/dock", (req, res) => {
+  res.json({
+    message: `Dock station Aussie`,
+    environment: NODE_ENV
+  });
+});
+
 app.get("/health", (req, res) => {
   res.status(200).send("OK");
 });
