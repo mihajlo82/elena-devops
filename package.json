@@ -7,7 +7,7 @@
     "test": "tests"
   },
   "scripts": {
-    "test": "NODE_ENV=test npx jest",
+    "test": "cross-env NODE_ENV=test jest",
     "start": "node app/index.js",
     "dev": "NODE_ENV=dev node app/index.js"
   },
@@ -20,6 +20,7 @@
     "express": "^5.2.1"
   },
   "devDependencies": {
+    "cross-env": "^10.1.0",
     "jest": "^29.7.0",
     "supertest": "^7.1.4"
   }
