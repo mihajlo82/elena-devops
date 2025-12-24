@@ -11,7 +11,7 @@ const APP_NAME = process.env.APP_NAME || "nodeapp";
 
 app.get("/", (req, res) => {
   res.json({
-    message: `Hello from ${APP_NAME} 1`,
+    message: `Hello from ${APP_NAME} 1234567`,
     environment: NODE_ENV
   });
 });
@@ -19,6 +19,13 @@ app.get("/", (req, res) => {
 app.get("/dock", (req, res) => {
   res.json({
     message: `Dock station Aussie 22`,
+    environment: NODE_ENV
+  });
+});
+
+app.get("/king", (req, res) => {
+  res.json({
+    message: `King king station Aussie 22`,
     environment: NODE_ENV
   });
 });
