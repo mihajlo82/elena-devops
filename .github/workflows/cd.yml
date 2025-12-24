@@ -37,12 +37,12 @@ jobs:
         host: ${{ secrets.EC2_HOST }}
         username: ubuntu
         key: ${{ secrets.EC2_SSH_KEY }}
-        env:
-          BRANCH: ${{ github.ref_name }}
         script: |
+          set -e
+
+          BRANCH="${{ github.ref_name }}"
           echo "Deploying branch: $BRANCH"
 
-          # Determine app directory and PM2 process name
           if [ "$BRANCH" = "dev" ]; then
             APP_DIR="/var/www/nodeapp-dev"
             PM2_NAME="nodeapp-dev"
@@ -51,28 +51,59 @@ jobs:
             PM2_NAME="nodeapp-prod"
           fi
 
-          echo "App directory: $APP_DIR"
-          echo "PM2 process: $PM2_NAME"
-
-          # Navigate to app directory
           cd $APP_DIR
-          pwd
-          ls -la
 
-          # Ensure latest code from GitHub
           git fetch origin
           git reset --hard origin/$BRANCH
+          git clean -fd
 
-          # Install production dependencies only
           npm ci --omit=dev
 
-          # Restart PM2 process; start if not running
           pm2 restart $PM2_NAME || pm2 start app/index.js --name $PM2_NAME
-
-          # Save PM2 process list for auto-start on reboot
           pm2 save
-          pm2 flush
 
-          # Optional: log latest commit deployed
-          echo "Deployed commit:"
-          git log -1 --oneline
+    # - name: Deploy to EC2
+    #   uses: appleboy/ssh-action@v1
+    #   with:
+    #     host: ${{ secrets.EC2_HOST }}
+    #     username: ubuntu
+    #     key: ${{ secrets.EC2_SSH_KEY }}
+    #     env:
+    #       BRANCH: ${{ github.ref_name }}
+    #     script: |
+    #       echo "Deploying branch: $BRANCH"
+
+    #       # Determine app directory and PM2 process name
+    #       if [ "$BRANCH" = "dev" ]; then
+    #         APP_DIR="/var/www/nodeapp-dev"
+    #         PM2_NAME="nodeapp-dev"
+    #       else
+    #         APP_DIR="/var/www/nodeapp-prod"
+    #         PM2_NAME="nodeapp-prod"
+    #       fi
+
+    #       echo "App directory: $APP_DIR"
+    #       echo "PM2 process: $PM2_NAME"
+
+    #       # Navigate to app directory
+    #       cd $APP_DIR
+    #       pwd
+    #       ls -la
+
+    #       # Ensure latest code from GitHub
+    #       git fetch origin
+    #       git reset --hard origin/$BRANCH
+
+    #       # Install production dependencies only
+    #       npm ci --omit=dev
+
+    #       # Restart PM2 process; start if not running
+    #       pm2 restart $PM2_NAME || pm2 start app/index.js --name $PM2_NAME
+
+    #       # Save PM2 process list for auto-start on reboot
+    #       pm2 save
+    #       pm2 flush
+
+    #       # Optional: log latest commit deployed
+    #       echo "Deployed commit:"
+    #       git log -1 --oneline
