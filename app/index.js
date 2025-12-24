@@ -18,14 +18,14 @@ app.get("/", (req, res) => {
 
 app.get("/dock", (req, res) => {
   res.json({
-    message: `Dock station Aussie 22`,
+    message: `Mack dokc Dock station Aussie 22`,
     environment: NODE_ENV
   });
 });
 
 app.get("/king", (req, res) => {
   res.json({
-    message: `BURGER King king station Aussie 22`,
+    message: `MC BURGER King king station Aussie 22`,
     environment: NODE_ENV
   });
 });
