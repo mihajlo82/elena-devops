@@ -1,0 +1,57 @@
+name: CI/CD Deploy
+
+on:
+  push:
+    branches:
+      - dev
+      - main
+ 
+jobs:
+  build-test-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Run tests
+      run: npm test
+
+    - name: Deploy to EC2
+      uses: appleboy/ssh-action@v1
+      env:
+        BRANCH: ${{ github.ref_name }}
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ubuntu
+        key: ${{ secrets.EC2_SSH_KEY }}
+        script: |
+          echo "Deploying branch: $BRANCH"
+
+          if [ "$BRANCH" = "dev" ]; then
+            APP_DIR="/var/www/nodeapp-dev"
+            PM2_NAME="nodeapp-dev"
+          else
+            APP_DIR="/var/www/nodeapp-prod"
+            PM2_NAME="nodeapp-prod"
+          fi
+
+          cd $APP_DIR
+
+          git fetch origin
+          git checkout $BRANCH
+          git reset --hard origin/$BRANCH
+
+          npm install --production
+
+          pm2 restart $PM2_NAME || pm2 start app.js --name $PM2_NAME
+
+          pm2 save
