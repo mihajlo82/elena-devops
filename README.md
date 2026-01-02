@@ -1,5 +1,3 @@
-🚀 DevOps CI/CD Case Study – Node.js Application
-
 # 🚀 DevOps CI/CD Case Study – Node.js Application
 
 ## 📖 Overview
