@@ -12,27 +12,28 @@ Showcase practical DevOps workflows and production-style automation — not just
 
 ---
 
-## 🏗 Architecture Overview
+## 🏗 Architecture Overview 
 
-
+```text
 Developer
    |
-   |  git push (dev / main)
+   | git push (dev / main)
    v
 GitHub Repository
    |
-   |  GitHub Actions (CI/CD)
-   |  - install dependencies
-   |  - run tests
-   |  - deploy via SSH
    v
+GitHub Actions (CI/CD)
+   ├─ Install dependencies
+   ├─ Run tests
+   └─ Deploy via SSH
+        |
+        v
 AWS EC2 Instance
-   |
-   |-- /var/www/nodeapp-dev   (dev branch)
-   |-- /var/www/nodeapp-prod  (main branch)
-   |
-   |-- PM2 process manager
-   |-- Nginx reverse proxy
+   ├─ /var/www/nodeapp-dev   (dev branch)
+   ├─ /var/www/nodeapp-prod  (main branch)
+   ├─ PM2 (process manager)
+   └─ Nginx (reverse proxy)
+```
 
 
 ---
